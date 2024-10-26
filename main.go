@@ -15,7 +15,7 @@ func main() {
 		os.Exit(0)
 	}
 
-	p := tea.NewProgram(NewBoard())
+	p := tea.NewProgram(NewState())
 	if _, err := p.Run(); err != nil {
 		fmt.Printf("Error starting program: %v", err)
 		os.Exit(1)

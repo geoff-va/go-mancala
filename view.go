@@ -1,5 +1,5 @@
 package main
 
-func (b Board) View() string {
-	return "board view"
+func (s State) View() string {
+	return "Game State"
 }
