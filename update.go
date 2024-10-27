@@ -190,8 +190,9 @@ func (s Model) getStoreIndex(player Player) uint8 {
 
 func (s *Model) steal() {
 	oppositePit := GetOppositePit(s.lastPlacedPit)
-	s.board[s.getStoreIndex(s.currentPlayer)] += s.board[oppositePit]
+	s.board[s.getStoreIndex(s.currentPlayer)] += s.board[oppositePit] + 1
 	s.board[oppositePit] = 0
+	s.board[s.lastPlacedPit] = 0
 	s.state = IsWinner
 }
 
