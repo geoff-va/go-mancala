@@ -28,9 +28,9 @@ type Model struct {
 	board           [14]uint8
 	currentPlayer   Player
 	selectedPit     uint8
+	lastSelectedPit map[Player]uint8
 	lastPlacedPit   uint8
 	inHand          uint8
-	lastSelectedPit map[Player]uint8
 	state           State
 }
 
@@ -38,9 +38,9 @@ func NewState() Model {
 	return Model{
 		board:           [14]uint8{0, 4, 4, 4, 4, 4, 4, 0, 4, 4, 4, 4, 4, 4},
 		currentPlayer:   P1,
+		selectedPit:     1,
 		lastSelectedPit: map[Player]uint8{P1: 1, P2: 13},
 		state:           SelectingPit,
-		selectedPit:     1,
 	}
 }
 
