@@ -110,22 +110,28 @@ func (s *Model) SelectPit() {
 
 	s.board[s.selectedPit] = 0
 	s.inHand = numInPit
-	s.selectedNum = numInPit
 	s.state = MovingFromHandToPit
 	s.lastSelectedPit[s.currentPlayer] = s.selectedPit
+	s.lastPlacedPit = s.selectedPit
 }
 
 func (s *Model) moveFromHandToPit() bool {
 	otherPlayer := Player((s.currentPlayer + 1) % 2)
 	otherStore := s.getStoreIndex(otherPlayer)
+	log.Printf("Other store: %d", otherStore)
 	if s.inHand > 0 {
-		pitIndex := (s.selectedPit + 1 + s.selectedNum - s.inHand)
-		if pitIndex == otherStore {
-			pitIndex++
+		var pitIndex uint8
+		if s.lastPlacedPit == 0 {
+			pitIndex = 13
+		} else {
+			pitIndex = s.lastPlacedPit - 1
 		}
-		pitIndex %= 14
+		if pitIndex == otherStore {
+			pitIndex--
+		}
 		s.board[pitIndex]++
 		s.inHand--
+		s.lastPlacedPit = pitIndex
 		return false
 	}
 
@@ -145,5 +151,5 @@ func (s *Model) SwitchPlayer() {
 }
 
 func (s Model) getStoreIndex(player Player) uint8 {
-	return uint8(player)*7 + 6
+	return (uint8(player) * 7)
 }

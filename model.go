@@ -26,7 +26,7 @@ type Model struct {
 	board           [14]uint8
 	currentPlayer   Player
 	selectedPit     uint8
-	selectedNum     uint8
+	lastPlacedPit   uint8
 	inHand          uint8
 	lastSelectedPit map[Player]uint8
 	state           uint8
