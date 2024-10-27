@@ -38,7 +38,7 @@ func TestMoveRight(t *testing.T) {
 			for range move.numMoves {
 				state.HandleMoveRight()
 			}
-			assert.Equal(state.selectedPit, move.expectedPit)
+			assert.Equal(move.expectedPit, state.selectedPit)
 		})
 	}
 }
@@ -76,7 +76,7 @@ func TestMoveLeft(t *testing.T) {
 			for range move.numMoves {
 				state.HandleMoveLeft()
 			}
-			assert.Equal(int(state.selectedPit), int(move.expectedPit))
+			assert.Equal(move.expectedPit, state.selectedPit)
 		})
 	}
 }
@@ -84,11 +84,11 @@ func TestMoveLeft(t *testing.T) {
 func TestSwitchPlayer(t *testing.T) {
 	assert := assert.New(t)
 	state := NewState()
-	assert.Equal(state.currentPlayer, P1)
+	assert.Equal(P1, state.currentPlayer)
 	state.HandleSwitchPlayer()
-	assert.Equal(state.currentPlayer, P2)
+	assert.Equal(P2, state.currentPlayer)
 	state.HandleSwitchPlayer()
-	assert.Equal(state.currentPlayer, P1)
+	assert.Equal(P1, state.currentPlayer)
 }
 
 func TestSelectPit(t *testing.T) {
@@ -98,11 +98,11 @@ func TestSelectPit(t *testing.T) {
 	state.HandleMoveRight()
 	nextState := state.HandleSelectPit()
 
-	assert.Equal(state.board[state.selectedPit], uint8(0), "Num now in pit")
-	assert.Equal(state.inHand, uint8(4), "inHand")
-	assert.Equal(state.lastPlacedPit, state.selectedPit, "lastPlacedPit")
-	assert.Equal(nextState, MovingFromHandToPit, "state")
-	assert.Equal(state.lastSelectedPit[state.currentPlayer], state.selectedPit, "lastSelectedPit")
+	assert.Equal(uint8(0), state.board[state.selectedPit], uint8(0), "Num now in pit")
+	assert.Equal(uint8(4), state.inHand, "inHand")
+	assert.Equal(state.selectedPit, state.lastPlacedPit, "lastPlacedPit")
+	assert.Equal(MovingFromHandToPit, nextState, "state")
+	assert.Equal(state.selectedPit, state.lastSelectedPit[state.currentPlayer], "lastSelectedPit")
 
 }
 
@@ -129,7 +129,7 @@ func TestGetOppositePit(t *testing.T) {
 
 	for _, tcase := range cases {
 		t.Run(tcase.name, func(t *testing.T) {
-			assert.Equal(GetOppositePit(tcase.pit), tcase.expected)
+			assert.Equal(tcase.expected, GetOppositePit(tcase.pit))
 		})
 	}
 
