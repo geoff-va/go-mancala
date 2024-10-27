@@ -24,6 +24,7 @@ func doTick(t int) tea.Cmd {
 
 func (s Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	var cmd tea.Cmd = nil
+	var nextState State
 
 	log.Printf("State: %d", s.state)
 	switch s.state {
@@ -34,40 +35,42 @@ func (s Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			case "q":
 				return s, tea.Quit
 			case "h":
-				s.MoveLeft()
+				nextState = s.MoveLeft()
 			case "l":
-				s.MoveRight()
+				nextState = s.MoveRight()
 			case "enter", " ":
-				s.SelectPit()
+				nextState = s.SelectPit()
 				cmd = doTick(1)
 			}
 		}
 	case MovingFromHandToPit:
-		isDone := s.moveFromHandToPit()
+		_nextState, isDone := s.moveFromHandToPit()
+		nextState = _nextState
 		if !isDone {
 			cmd = doTick(1000)
 		} else {
 			cmd = doTick(1)
 		}
 	case Stealing:
-		s.steal()
+		nextState = s.steal()
 		cmd = doTick(1000)
 
 	case IsWinner:
 		// TODO: Evaluate winner
-		s.state = SwitchPlayer
+		nextState = SwitchPlayer
 		cmd = doTick(1)
 	case SwitchPlayer:
 		s.SwitchPlayer()
-		s.state = SelectingPit
+		nextState = SelectingPit
 		cmd = doTick(1)
 	case GameOver:
 	}
 
+	s.state = nextState
 	return s, cmd
 }
 
-func (s *Model) MoveRight() {
+func (s *Model) MoveRight() State {
 	// TODO: handle moving past empty pits
 	lBound, uBound := getPlayerBounds(s.currentPlayer)
 	if s.currentPlayer == P2 {
@@ -83,9 +86,10 @@ func (s *Model) MoveRight() {
 			s.selectedPit = lBound
 		}
 	}
+	return SelectingPit
 }
 
-func (s *Model) MoveLeft() {
+func (s *Model) MoveLeft() State {
 	// TODO: handle moving past empty pits
 	lBound, uBound := getPlayerBounds(s.currentPlayer)
 	if s.currentPlayer == P2 {
@@ -101,6 +105,7 @@ func (s *Model) MoveLeft() {
 			s.selectedPit = uBound
 		}
 	}
+	return SelectingPit
 }
 
 // getPlayerBounds returns the lower and upper movable bounds of the pits for a given player.
@@ -110,7 +115,7 @@ func getPlayerBounds(p Player) (lBound, uBound uint8) {
 	return
 }
 
-func (s *Model) SelectPit() {
+func (s *Model) SelectPit() State {
 	numInPit := s.board[s.selectedPit]
 
 	if numInPit == 0 {
@@ -119,12 +124,12 @@ func (s *Model) SelectPit() {
 
 	s.board[s.selectedPit] = 0
 	s.inHand = numInPit
-	s.state = MovingFromHandToPit
 	s.lastSelectedPit[s.currentPlayer] = s.selectedPit
 	s.lastPlacedPit = s.selectedPit
+	return MovingFromHandToPit
 }
 
-func (s *Model) moveFromHandToPit() bool {
+func (s *Model) moveFromHandToPit() (State, bool) {
 	// If something in your hand, place it in next pit
 	// After if you have nothing left, check if you can steal
 	otherPlayer := Player((s.currentPlayer + 1) % 2)
@@ -146,26 +151,24 @@ func (s *Model) moveFromHandToPit() bool {
 		s.inHand--
 		s.board[pitIndex]++
 		s.lastPlacedPit = pitIndex
-		return false
+		return MovingFromHandToPit, false
 	}
 
 	pitIndex = s.lastPlacedPit
 	// You get another turn if you end in your store
 	if pitIndex == s.getStoreIndex(s.currentPlayer) {
-		s.state = SelectingPit
-	} else {
-		s.state = IsWinner
+		return SelectingPit, true
 	}
 
+	// Turn over
 	if !onPlayersSide(pitIndex, s.currentPlayer) ||
 		pitIndex == s.getStoreIndex(s.currentPlayer) ||
 		s.board[pitIndex] != 1 ||
 		s.board[GetOppositePit(pitIndex)] == 0 {
-		return false
+		return IsWinner, false
 	}
 
-	s.state = Stealing
-	return true
+	return Stealing, true
 
 }
 
@@ -183,12 +186,12 @@ func (s Model) getStoreIndex(player Player) uint8 {
 	return (uint8(player) * 7)
 }
 
-func (s *Model) steal() {
+func (s *Model) steal() State {
 	oppositePit := GetOppositePit(s.lastPlacedPit)
 	s.board[s.getStoreIndex(s.currentPlayer)] += s.board[oppositePit] + 1
 	s.board[oppositePit] = 0
 	s.board[s.lastPlacedPit] = 0
-	s.state = IsWinner
+	return IsWinner
 }
 
 func GetOppositePit(pit uint8) uint8 {
