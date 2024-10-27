@@ -75,6 +75,7 @@ var leftMoves = []struct {
 	{"Left4P1", 4, 2, P1},
 	{"Left5P1", 5, 1, P1},
 	{"Left6P1", 6, 0, P1},
+	{"Left2P1", 1, 7, P2},
 	{"Left2P2", 2, 8, P2},
 	{"Left3P2", 3, 9, P2},
 	{"Left4P2", 4, 10, P2},
