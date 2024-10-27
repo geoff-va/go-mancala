@@ -61,3 +61,30 @@ func TestMoveRight_P2(t *testing.T) {
 		})
 	}
 }
+
+var leftMovesP1 = []struct {
+	name        string
+	numMoves    uint8
+	expectedPit uint8
+}{
+	{"Left1", 1, 5},
+	{"Left2", 2, 4},
+	{"Left3", 3, 3},
+	{"Left4", 4, 2},
+	{"Left5", 5, 1},
+	{"Left6", 6, 0},
+}
+
+func TestMoveLeft_P1(t *testing.T) {
+	assert := assert.New(t)
+
+	for _, move := range leftMovesP1 {
+		t.Run(move.name, func(t *testing.T) {
+			state := NewState()
+			for range move.numMoves {
+				state.MoveLeft()
+			}
+			assert.Equal(state.selectedPit, move.expectedPit)
+		})
+	}
+}
