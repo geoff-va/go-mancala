@@ -134,3 +134,14 @@ func TestGetOppositePit(t *testing.T) {
 	}
 
 }
+
+func TestMovingFromHandToPit_HandNotEmpty(t *testing.T) {
+	state := NewState()
+
+	state.state = state.HandleSelectPit()
+	nextState, isDone := state.HandleMoveFromHandToPit()
+
+	assert.Equal(t, int(MovingFromHandToPit), int(nextState), "next state")
+	assert.Equal(t, false, isDone, "isDone")
+
+}
