@@ -90,3 +90,18 @@ func TestSwitchPlayer(t *testing.T) {
 	state.SwitchPlayer()
 	assert.Equal(state.currentPlayer, P1)
 }
+
+func TestSelectPit(t *testing.T) {
+	assert := assert.New(t)
+	state := NewState()
+
+	state.MoveRight()
+	state.SelectPit()
+
+	assert.Equal(state.board[state.selectedPit], uint8(0), "Num now in pit")
+	assert.Equal(state.inHand, uint8(4), "inHand")
+	assert.Equal(state.selectedNum, uint8(4), "selectedNum")
+	assert.Equal(state.state, MovingFromHandToPit, "state")
+	assert.Equal(state.lastSelectedPit[state.currentPlayer], state.selectedPit, "lastSelectedPit")
+
+}
