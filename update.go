@@ -35,19 +35,9 @@ func (s Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			case "q":
 				return s, tea.Quit
 			case "h":
-				switch s.currentPlayer {
-				case P1:
-					s.MoveLeft()
-				case P2:
-					s.MoveRight()
-				}
+				s.MoveLeft()
 			case "l":
-				switch s.currentPlayer {
-				case P1:
-					s.MoveRight()
-				case P2:
-					s.MoveLeft()
-				}
+				s.MoveRight()
 			case "enter", " ":
 				s.SelectPit()
 				cmd = doTick(1)
@@ -79,20 +69,36 @@ func (s Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 func (s *Model) MoveRight() {
 	// TODO: handle moving past empty pits
 	lBound, uBound := getPlayerBounds(s.currentPlayer)
-	if s.selectedPit < uBound {
-		s.selectedPit++
+	if s.currentPlayer == P2 {
+		if s.selectedPit > lBound {
+			s.selectedPit--
+		} else {
+			s.selectedPit = uBound
+		}
 	} else {
-		s.selectedPit = lBound
+		if s.selectedPit < uBound {
+			s.selectedPit++
+		} else {
+			s.selectedPit = lBound
+		}
 	}
 }
 
 func (s *Model) MoveLeft() {
 	// TODO: handle moving past empty pits
 	lBound, uBound := getPlayerBounds(s.currentPlayer)
-	if s.selectedPit > lBound {
-		s.selectedPit--
+	if s.currentPlayer == P2 {
+		if s.selectedPit > lBound {
+			s.selectedPit--
+		} else {
+			s.selectedPit = uBound
+		}
 	} else {
-		s.selectedPit = uBound
+		if s.selectedPit > lBound {
+			s.selectedPit--
+		} else {
+			s.selectedPit = uBound
+		}
 	}
 }
 
