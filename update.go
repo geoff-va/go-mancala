@@ -16,14 +16,6 @@ func doTick(t int) tea.Cmd {
 }
 
 func (s Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
-	// Flow:
-	// State: SelectPit
-	//   - MoveLeft, MoveRight, SelectPit
-	// State: SelectPit -> MoveFromHandToPit
-	//   - While inHand -> MoveFromHandToPit
-	// State: MoveFromHandToPit -> IsWinner
-	// State IsWinner -> SelectPit (Switch player)
-
 	var cmd tea.Cmd = nil
 
 	log.Printf("State: %d", s.state)
@@ -124,12 +116,17 @@ func (s *Model) SelectPit() {
 }
 
 func (s *Model) moveFromHandToPit() bool {
+	otherPlayer := Player((s.currentPlayer + 1) % 2)
+	otherStore := s.getStoreIndex(otherPlayer)
 	if s.inHand > 0 {
-		pitIndex := (s.selectedPit + 1 + s.selectedNum - s.inHand) % 14
-		log.Printf("pitIndex: %d", pitIndex)
+		pitIndex := (s.selectedPit + 1 + s.selectedNum - s.inHand)
+		if pitIndex == otherStore {
+			// skip the other player's store
+			pitIndex = (pitIndex + 1)
+		}
+		pitIndex = pitIndex % 14
 		s.board[pitIndex]++
 		s.inHand--
-		log.Printf("s.inHand: %d", s.inHand)
 		return false
 	}
 
@@ -146,4 +143,8 @@ func (s *Model) SwitchPlayer() {
 		s.currentPlayer = P1
 		s.selectedPit = s.lastSelectedPit[P1]
 	}
+}
+
+func (s Model) getStoreIndex(player Player) uint8 {
+	return uint8(player)*7 + 6
 }
