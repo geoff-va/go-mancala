@@ -155,8 +155,13 @@ func (s *Model) moveFromHandToPit() bool {
 		return false
 	}
 
-	// Last stone
-	s.state = IsWinner
+	// You get another turn if you end in your store
+	if pitIndex == s.getStoreIndex(s.currentPlayer) {
+		s.state = SelectingPit
+	} else {
+		s.state = IsWinner
+	}
+
 	if !onPlayersSide(pitIndex, s.currentPlayer) ||
 		pitIndex == s.getStoreIndex(s.currentPlayer) ||
 		s.board[pitIndex] != 1 ||
