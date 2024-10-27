@@ -1,3 +1,8 @@
+//	1  2  3  4  5  6
+//
+// 0                    7
+//
+//	13 12 11 10 9  8
 package main
 
 import (
@@ -6,6 +11,8 @@ import (
 
 	tea "github.com/charmbracelet/bubbletea"
 )
+
+var oppositeIdxOffsets [14]uint8 = [14]uint8{7, 13, 12, 11, 10, 9, 8, 0, 6, 5, 4, 3, 2, 1}
 
 type TickMsg time.Time
 
@@ -43,6 +50,10 @@ func (s Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		} else {
 			cmd = doTick(1)
 		}
+	case Stealing:
+		s.steal()
+		cmd = doTick(1000)
+
 	case IsWinner:
 		// TODO: Evaluate winner
 		s.state = SwitchPlayer
@@ -116,26 +127,44 @@ func (s *Model) SelectPit() {
 }
 
 func (s *Model) moveFromHandToPit() bool {
+	// If something in your hand, place it in next pit
+	// After if you have nothing left, check if you can steal
 	otherPlayer := Player((s.currentPlayer + 1) % 2)
 	otherStore := s.getStoreIndex(otherPlayer)
-	log.Printf("Other store: %d", otherStore)
+
+	// get next pit we're going to place a stone in
+	var pitIndex uint8
+	if s.lastPlacedPit == 0 {
+		pitIndex = 13
+	} else {
+		pitIndex = s.lastPlacedPit - 1
+	}
+
 	if s.inHand > 0 {
-		var pitIndex uint8
-		if s.lastPlacedPit == 0 {
-			pitIndex = 13
-		} else {
-			pitIndex = s.lastPlacedPit - 1
-		}
+		// Skip the other player's store
 		if pitIndex == otherStore {
 			pitIndex--
 		}
-		s.board[pitIndex]++
 		s.inHand--
+		s.board[pitIndex]++
 		s.lastPlacedPit = pitIndex
+	}
+
+	// Stones Left
+	if s.inHand > 0 {
 		return false
 	}
 
+	// Last stone
 	s.state = IsWinner
+	if !onPlayersSide(pitIndex, s.currentPlayer) ||
+		pitIndex == s.getStoreIndex(s.currentPlayer) ||
+		s.board[pitIndex] != 1 ||
+		s.board[GetOppositePit(pitIndex)] == 0 {
+		return false
+	}
+
+	s.state = Stealing
 	return true
 
 }
@@ -152,4 +181,20 @@ func (s *Model) SwitchPlayer() {
 
 func (s Model) getStoreIndex(player Player) uint8 {
 	return (uint8(player) * 7)
+}
+
+func (s *Model) steal() {
+	oppositePit := GetOppositePit(s.lastPlacedPit)
+	s.board[s.getStoreIndex(s.currentPlayer)] += s.board[oppositePit]
+	s.board[oppositePit] = 0
+	s.state = IsWinner
+}
+
+func GetOppositePit(pit uint8) uint8 {
+	return oppositeIdxOffsets[pit]
+}
+
+func onPlayersSide(pit uint8, player Player) bool {
+	lBound, uBound := getPlayerBounds(player)
+	return pit >= lBound && pit <= uBound
 }

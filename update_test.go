@@ -105,3 +105,32 @@ func TestSelectPit(t *testing.T) {
 	assert.Equal(state.lastSelectedPit[state.currentPlayer], state.selectedPit, "lastSelectedPit")
 
 }
+
+func TestGetOppositePit(t *testing.T) {
+	var cases = []struct {
+		name     string
+		pit      uint8
+		expected uint8
+	}{
+		{"Opposite1", 1, 13},
+		{"Opposite2", 2, 12},
+		{"Opposite3", 3, 11},
+		{"Opposite4", 4, 10},
+		{"Opposite5", 5, 9},
+		{"Opposite6", 6, 8},
+		{"Opposite8", 8, 6},
+		{"Opposite9", 9, 5},
+		{"Opposite10", 10, 4},
+		{"Opposite11", 11, 3},
+		{"Opposite12", 12, 2},
+		{"Opposite13", 13, 1},
+	}
+	assert := assert.New(t)
+
+	for _, tcase := range cases {
+		t.Run(tcase.name, func(t *testing.T) {
+			assert.Equal(GetOppositePit(tcase.pit), tcase.expected)
+		})
+	}
+
+}
