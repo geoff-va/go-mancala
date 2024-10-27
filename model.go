@@ -35,7 +35,7 @@ func NewState() Model {
 	return Model{
 		board:           [14]uint8{4, 4, 4, 4, 4, 4, 0, 4, 4, 4, 4, 4, 4, 0},
 		currentPlayer:   P1,
-		lastSelectedPit: map[Player]uint8{P1: 0, P2: 7},
+		lastSelectedPit: map[Player]uint8{P1: 0, P2: 12},
 		state:           SelectingPit,
 		selectedPit:     0,
 	}
