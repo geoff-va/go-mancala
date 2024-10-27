@@ -32,6 +32,7 @@ type Model struct {
 	lastPlacedPit   uint8
 	inHand          uint8
 	state           State
+	winner          Player
 }
 
 func NewState() Model {

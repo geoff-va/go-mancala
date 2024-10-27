@@ -52,10 +52,8 @@ func (s Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case Stealing:
 		nextState = s.HandleSteal()
 		cmd = doTick(1)
-
 	case IsWinner:
-		// TODO: Evaluate winner
-		nextState = SwitchPlayer
+		nextState = s.HandleIsWinner()
 		cmd = doTick(1)
 	case SwitchPlayer:
 		nextState = s.HandleSwitchPlayer()
@@ -199,4 +197,26 @@ func GetOppositePit(pit uint8) uint8 {
 func onPlayersSide(pit uint8, player Player) bool {
 	lBound, uBound := getPlayerBounds(player)
 	return pit >= lBound && pit <= uBound
+}
+
+func (s Model) HandleIsWinner() State {
+	p1wins := true
+	p2wins := true
+
+	for i := range 5 {
+		p1wins = p1wins && s.board[i+1] == 0
+		p2wins = p2wins && s.board[i+7] == 0
+	}
+	if p1wins {
+		s.winner = P1
+		return GameOver
+	}
+
+	if p2wins {
+		s.winner = P2
+		return GameOver
+	}
+
+	return SwitchPlayer
+
 }
