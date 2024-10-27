@@ -6,14 +6,14 @@ import tea "github.com/charmbracelet/bubbletea"
 
 type Player uint8
 
+// Players
 const (
-	// Players
 	P1 Player = iota
 	P2
 )
 
+// Game States
 const (
-	// Game States
 	SelectingPit uint8 = iota
 	MovingFromHandToPit
 	IsWinner
