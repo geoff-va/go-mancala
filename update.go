@@ -1,7 +1,6 @@
 package main
 
 import (
-	"log"
 	"time"
 
 	tea "github.com/charmbracelet/bubbletea"
@@ -18,17 +17,22 @@ func doTick(t int) tea.Cmd {
 }
 
 func (s Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
+	// Catch quit early
+	switch msg := msg.(type) {
+	case tea.KeyMsg:
+		switch msg.String() {
+		case "q":
+			return s, tea.Quit
+		}
+	}
 	var cmd tea.Cmd = nil
 	var nextState State
 
-	log.Printf("State: %d", s.state)
 	switch s.state {
 	case SelectingPit:
 		switch msg := msg.(type) {
 		case tea.KeyMsg:
 			switch msg.String() {
-			case "q":
-				return s, tea.Quit
 			case "h":
 				nextState = s.HandleMoveLeft()
 			case "l":
@@ -39,16 +43,15 @@ func (s Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			}
 		}
 	case MovingFromHandToPit:
-		_nextState, isDone := s.HandleMoveFromHandToPit()
-		nextState = _nextState
-		if !isDone {
+		nextState = s.HandleMoveFromHandToPit()
+		if nextState == MovingFromHandToPit {
 			cmd = doTick(1000)
 		} else {
 			cmd = doTick(1)
 		}
 	case Stealing:
 		nextState = s.HandleSteal()
-		cmd = doTick(1000)
+		cmd = doTick(1)
 
 	case IsWinner:
 		// TODO: Evaluate winner
@@ -123,7 +126,7 @@ func (s *Model) HandleSelectPit() State {
 	return MovingFromHandToPit
 }
 
-func (s *Model) HandleMoveFromHandToPit() (State, bool) {
+func (s *Model) HandleMoveFromHandToPit() State {
 	// If something in your hand, place it in next pit
 	// After if you have nothing left, check if you can steal
 	otherPlayer := Player((s.currentPlayer + 1) % 2)
@@ -145,13 +148,13 @@ func (s *Model) HandleMoveFromHandToPit() (State, bool) {
 		s.inHand--
 		s.board[pitIndex]++
 		s.lastPlacedPit = pitIndex
-		return MovingFromHandToPit, false
+		return MovingFromHandToPit
 	}
 
 	pitIndex = s.lastPlacedPit
 	// You get another turn if you end in your store
 	if pitIndex == s.getStoreIndex(s.currentPlayer) {
-		return SelectingPit, true
+		return SelectingPit
 	}
 
 	// Turn over
@@ -159,10 +162,10 @@ func (s *Model) HandleMoveFromHandToPit() (State, bool) {
 		pitIndex == s.getStoreIndex(s.currentPlayer) ||
 		s.board[pitIndex] != 1 ||
 		s.board[GetOppositePit(pitIndex)] == 0 {
-		return IsWinner, false
+		return IsWinner
 	}
 
-	return Stealing, true
+	return Stealing
 
 }
 
