@@ -35,16 +35,16 @@ func (s Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			case "q":
 				return s, tea.Quit
 			case "h":
-				nextState = s.MoveLeft()
+				nextState = s.HandleMoveLeft()
 			case "l":
-				nextState = s.MoveRight()
+				nextState = s.HandleMoveRight()
 			case "enter", " ":
-				nextState = s.SelectPit()
+				nextState = s.HandleSelectPit()
 				cmd = doTick(1)
 			}
 		}
 	case MovingFromHandToPit:
-		_nextState, isDone := s.moveFromHandToPit()
+		_nextState, isDone := s.HandleMoveFromHandToPit()
 		nextState = _nextState
 		if !isDone {
 			cmd = doTick(1000)
@@ -52,7 +52,7 @@ func (s Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			cmd = doTick(1)
 		}
 	case Stealing:
-		nextState = s.steal()
+		nextState = s.HandleSteal()
 		cmd = doTick(1000)
 
 	case IsWinner:
@@ -60,8 +60,7 @@ func (s Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		nextState = SwitchPlayer
 		cmd = doTick(1)
 	case SwitchPlayer:
-		s.SwitchPlayer()
-		nextState = SelectingPit
+		nextState = s.HandleSwitchPlayer()
 		cmd = doTick(1)
 	case GameOver:
 	}
@@ -70,7 +69,7 @@ func (s Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	return s, cmd
 }
 
-func (s *Model) MoveRight() State {
+func (s *Model) HandleMoveRight() State {
 	// TODO: handle moving past empty pits
 	lBound, uBound := getPlayerBounds(s.currentPlayer)
 	if s.currentPlayer == P2 {
@@ -89,7 +88,7 @@ func (s *Model) MoveRight() State {
 	return SelectingPit
 }
 
-func (s *Model) MoveLeft() State {
+func (s *Model) HandleMoveLeft() State {
 	// TODO: handle moving past empty pits
 	lBound, uBound := getPlayerBounds(s.currentPlayer)
 	if s.currentPlayer == P2 {
@@ -115,7 +114,7 @@ func getPlayerBounds(p Player) (lBound, uBound uint8) {
 	return
 }
 
-func (s *Model) SelectPit() State {
+func (s *Model) HandleSelectPit() State {
 	numInPit := s.board[s.selectedPit]
 
 	if numInPit == 0 {
@@ -129,7 +128,7 @@ func (s *Model) SelectPit() State {
 	return MovingFromHandToPit
 }
 
-func (s *Model) moveFromHandToPit() (State, bool) {
+func (s *Model) HandleMoveFromHandToPit() (State, bool) {
 	// If something in your hand, place it in next pit
 	// After if you have nothing left, check if you can steal
 	otherPlayer := Player((s.currentPlayer + 1) % 2)
@@ -172,7 +171,7 @@ func (s *Model) moveFromHandToPit() (State, bool) {
 
 }
 
-func (s *Model) SwitchPlayer() {
+func (s *Model) HandleSwitchPlayer() State {
 	if s.currentPlayer == P1 {
 		s.currentPlayer = P2
 		s.selectedPit = s.lastSelectedPit[P2]
@@ -180,13 +179,14 @@ func (s *Model) SwitchPlayer() {
 		s.currentPlayer = P1
 		s.selectedPit = s.lastSelectedPit[P1]
 	}
+	return SelectingPit
 }
 
 func (s Model) getStoreIndex(player Player) uint8 {
 	return (uint8(player) * 7)
 }
 
-func (s *Model) steal() State {
+func (s *Model) HandleSteal() State {
 	oppositePit := GetOppositePit(s.lastPlacedPit)
 	s.board[s.getStoreIndex(s.currentPlayer)] += s.board[oppositePit] + 1
 	s.board[oppositePit] = 0

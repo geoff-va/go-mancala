@@ -32,11 +32,11 @@ func TestMoveRight(t *testing.T) {
 		t.Run(move.name, func(t *testing.T) {
 			state := NewState()
 			if move.player == P2 {
-				state.SwitchPlayer()
+				state.HandleSwitchPlayer()
 			}
 
 			for range move.numMoves {
-				state.MoveRight()
+				state.HandleMoveRight()
 			}
 			assert.Equal(state.selectedPit, move.expectedPit)
 		})
@@ -70,11 +70,11 @@ func TestMoveLeft(t *testing.T) {
 		t.Run(move.name, func(t *testing.T) {
 			state := NewState()
 			if move.player == P2 {
-				state.SwitchPlayer()
+				state.HandleSwitchPlayer()
 			}
 
 			for range move.numMoves {
-				state.MoveLeft()
+				state.HandleMoveLeft()
 			}
 			assert.Equal(int(state.selectedPit), int(move.expectedPit))
 		})
@@ -85,9 +85,9 @@ func TestSwitchPlayer(t *testing.T) {
 	assert := assert.New(t)
 	state := NewState()
 	assert.Equal(state.currentPlayer, P1)
-	state.SwitchPlayer()
+	state.HandleSwitchPlayer()
 	assert.Equal(state.currentPlayer, P2)
-	state.SwitchPlayer()
+	state.HandleSwitchPlayer()
 	assert.Equal(state.currentPlayer, P1)
 }
 
@@ -95,8 +95,8 @@ func TestSelectPit(t *testing.T) {
 	assert := assert.New(t)
 	state := NewState()
 
-	state.MoveRight()
-	nextState := state.SelectPit()
+	state.HandleMoveRight()
+	nextState := state.HandleSelectPit()
 
 	assert.Equal(state.board[state.selectedPit], uint8(0), "Num now in pit")
 	assert.Equal(state.inHand, uint8(4), "inHand")
