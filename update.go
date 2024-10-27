@@ -144,5 +144,4 @@ func (s *Model) SwitchPlayer() {
 	} else {
 		s.currentPlayer = P1
 	}
-	log.Printf("Switching player to %d", s.currentPlayer)
 }
