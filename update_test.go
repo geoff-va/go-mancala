@@ -7,7 +7,7 @@ import (
 )
 
 func TestMoveRight(t *testing.T) {
-	var moves = []struct {
+	var cases = []struct {
 		name        string
 		numMoves    uint8
 		expectedPit uint8
@@ -28,7 +28,7 @@ func TestMoveRight(t *testing.T) {
 	}
 	assert := assert.New(t)
 
-	for _, move := range moves {
+	for _, move := range cases {
 		t.Run(move.name, func(t *testing.T) {
 			state := NewState()
 			if move.player == P2 {
@@ -44,7 +44,7 @@ func TestMoveRight(t *testing.T) {
 }
 
 func TestMoveLeft(t *testing.T) {
-	var moves = []struct {
+	var cases = []struct {
 		name        string
 		numMoves    uint8
 		expectedPit uint8
@@ -66,7 +66,7 @@ func TestMoveLeft(t *testing.T) {
 	}
 	assert := assert.New(t)
 
-	for _, move := range moves {
+	for _, move := range cases {
 		t.Run(move.name, func(t *testing.T) {
 			state := NewState()
 			if move.player == P2 {
@@ -79,4 +79,14 @@ func TestMoveLeft(t *testing.T) {
 			assert.Equal(int(state.selectedPit), int(move.expectedPit))
 		})
 	}
+}
+
+func TestSwitchPlayer(t *testing.T) {
+	assert := assert.New(t)
+	state := NewState()
+	assert.Equal(state.currentPlayer, P1)
+	state.SwitchPlayer()
+	assert.Equal(state.currentPlayer, P2)
+	state.SwitchPlayer()
+	assert.Equal(state.currentPlayer, P1)
 }
