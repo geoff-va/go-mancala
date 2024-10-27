@@ -46,7 +46,6 @@ func (s Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		isDone := s.moveFromHandToPit()
 		if !isDone {
 			cmd = doTick(1000)
-			log.Printf("Not done; more in hand")
 		} else {
 			cmd = doTick(1)
 		}
@@ -58,7 +57,6 @@ func (s Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		// TODO: Evaluate winner
 		s.state = SwitchPlayer
 		cmd = doTick(1)
-		log.Println("Switching player")
 	case SwitchPlayer:
 		s.SwitchPlayer()
 		s.state = SelectingPit
@@ -148,13 +146,10 @@ func (s *Model) moveFromHandToPit() bool {
 		s.inHand--
 		s.board[pitIndex]++
 		s.lastPlacedPit = pitIndex
-	}
-
-	// Stones Left
-	if s.inHand > 0 {
 		return false
 	}
 
+	pitIndex = s.lastPlacedPit
 	// You get another turn if you end in your store
 	if pitIndex == s.getStoreIndex(s.currentPlayer) {
 		s.state = SelectingPit
