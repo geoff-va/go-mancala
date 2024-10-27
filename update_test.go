@@ -62,29 +62,40 @@ func TestMoveRight_P2(t *testing.T) {
 	}
 }
 
-var leftMovesP1 = []struct {
+var leftMoves = []struct {
 	name        string
 	numMoves    uint8
 	expectedPit uint8
+	player      Player
 }{
-	{"Left1", 1, 5},
-	{"Left2", 2, 4},
-	{"Left3", 3, 3},
-	{"Left4", 4, 2},
-	{"Left5", 5, 1},
-	{"Left6", 6, 0},
+
+	{"Left1P1", 1, 5, P1},
+	{"Left2P1", 2, 4, P1},
+	{"Left3P1", 3, 3, P1},
+	{"Left4P1", 4, 2, P1},
+	{"Left5P1", 5, 1, P1},
+	{"Left6P1", 6, 0, P1},
+	{"Left2P2", 2, 8, P2},
+	{"Left3P2", 3, 9, P2},
+	{"Left4P2", 4, 10, P2},
+	{"Left5P2", 5, 11, P2},
+	{"Left6P2", 6, 12, P2},
 }
 
-func TestMoveLeft_P1(t *testing.T) {
+func TestMoveLeft(t *testing.T) {
 	assert := assert.New(t)
 
-	for _, move := range leftMovesP1 {
+	for _, move := range leftMoves {
 		t.Run(move.name, func(t *testing.T) {
 			state := NewState()
+			if move.player == P2 {
+				state.SwitchPlayer()
+			}
+
 			for range move.numMoves {
 				state.MoveLeft()
 			}
-			assert.Equal(state.selectedPit, move.expectedPit)
+			assert.Equal(int(state.selectedPit), int(move.expectedPit))
 		})
 	}
 }

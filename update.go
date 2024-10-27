@@ -88,10 +88,10 @@ func (s *Model) MoveLeft() {
 	// TODO: handle moving past empty pits
 	lBound, uBound := getPlayerBounds(s.currentPlayer)
 	if s.currentPlayer == P2 {
-		if s.selectedPit > lBound {
-			s.selectedPit--
+		if s.selectedPit < uBound {
+			s.selectedPit++
 		} else {
-			s.selectedPit = uBound
+			s.selectedPit = lBound
 		}
 	} else {
 		if s.selectedPit > lBound {
@@ -141,7 +141,9 @@ func (s *Model) moveFromHandToPit() bool {
 func (s *Model) SwitchPlayer() {
 	if s.currentPlayer == P1 {
 		s.currentPlayer = P2
+		s.selectedPit = s.lastSelectedPit[P2]
 	} else {
 		s.currentPlayer = P1
+		s.selectedPit = s.lastSelectedPit[P1]
 	}
 }
