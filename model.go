@@ -10,7 +10,9 @@ const (
 	// Players
 	P1 Player = iota
 	P2
+)
 
+const (
 	// Game States
 	SelectingPit uint8 = iota
 	MovingFromHandToPit
@@ -19,28 +21,30 @@ const (
 	GameOver
 )
 
-type State struct {
-	board            [14]uint8
-	currentPlayer    Player
-	selectedPit      uint8
-	inHand           uint8
-	lastSelectedCell map[Player]uint8
-	state            uint8
+type Model struct {
+	board           [14]uint8
+	currentPlayer   Player
+	selectedPit     uint8
+	selectedNum     uint8
+	inHand          uint8
+	lastSelectedPit map[Player]uint8
+	state           uint8
 }
 
-func NewState() State {
-	return State{
-		board:            [14]uint8{4, 4, 4, 4, 4, 4, 0, 4, 4, 4, 4, 4, 4, 0},
-		currentPlayer:    P1,
-		lastSelectedCell: map[Player]uint8{P1: 0, P2: 7},
-		state:            SelectingPit,
+func NewState() Model {
+	return Model{
+		board:           [14]uint8{4, 4, 4, 4, 4, 4, 0, 4, 4, 4, 4, 4, 4, 0},
+		currentPlayer:   P1,
+		lastSelectedPit: map[Player]uint8{P1: 0, P2: 7},
+		state:           SelectingPit,
+		selectedPit:     0,
 	}
 }
 
-func (s State) Init() tea.Cmd {
+func (s Model) Init() tea.Cmd {
 	return nil
 }
 
-func (s State) numInStore(p Player) uint8 {
+func (s Model) numInStore(p Player) uint8 {
 	return s.board[p*7+6]
 }

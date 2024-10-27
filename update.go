@@ -1,8 +1,21 @@
 package main
 
-import tea "github.com/charmbracelet/bubbletea"
+import (
+	"log"
+	"time"
 
-func (s State) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
+	tea "github.com/charmbracelet/bubbletea"
+)
+
+type TickMsg time.Time
+
+func doTick(t int) tea.Cmd {
+	return tea.Tick(time.Duration(t)*time.Millisecond, func(t time.Time) tea.Msg {
+		return TickMsg(t)
+	})
+}
+
+func (s Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	// Flow:
 	// State: SelectPit
 	//   - MoveLeft, MoveRight, SelectPit
@@ -10,32 +23,60 @@ func (s State) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	//   - While inHand -> MoveFromHandToPit
 	// State: MoveFromHandToPit -> IsWinner
 	// State IsWinner -> SelectPit (Switch player)
+
+	var cmd tea.Cmd = nil
+
+	log.Printf("State: %d", s.state)
 	switch s.state {
 	case SelectingPit:
+		switch msg := msg.(type) {
+		case tea.KeyMsg:
+			switch msg.String() {
+			case "q":
+				return s, tea.Quit
+			case "h":
+				switch s.currentPlayer {
+				case P1:
+					s.MoveLeft()
+				case P2:
+					s.MoveRight()
+				}
+			case "l":
+				switch s.currentPlayer {
+				case P1:
+					s.MoveRight()
+				case P2:
+					s.MoveLeft()
+				}
+			case "enter", " ":
+				s.SelectPit()
+				cmd = doTick(1)
+			}
+		}
 	case MovingFromHandToPit:
+		isDone := s.moveFromHandToPit()
+		if !isDone {
+			cmd = doTick(1000)
+			log.Printf("Not done; more in hand")
+		} else {
+			cmd = doTick(1)
+		}
 	case IsWinner:
+		// TODO: Evaluate winner
+		s.state = SwitchPlayer
+		cmd = doTick(1)
+		log.Println("Switching player")
 	case SwitchPlayer:
+		s.SwitchPlayer()
+		s.state = SelectingPit
+		cmd = doTick(1)
 	case GameOver:
 	}
 
-	switch msg := msg.(type) {
-	case tea.KeyMsg:
-		switch msg.String() {
-		case "q":
-			return s, tea.Quit
-		case "h":
-			s.MoveLeft()
-		case "l":
-			s.MoveRight()
-		case "enter", " ":
-			s.SelectPit()
-		}
-
-	}
-	return s, nil
+	return s, cmd
 }
 
-func (s *State) MoveRight() {
+func (s *Model) MoveRight() {
 	// TODO: handle moving past empty pits
 	lBound, uBound := getPlayerBounds(s.currentPlayer)
 	if s.selectedPit < uBound {
@@ -45,7 +86,7 @@ func (s *State) MoveRight() {
 	}
 }
 
-func (s *State) MoveLeft() {
+func (s *Model) MoveLeft() {
 	// TODO: handle moving past empty pits
 	lBound, uBound := getPlayerBounds(s.currentPlayer)
 	if s.selectedPit > lBound {
@@ -62,7 +103,7 @@ func getPlayerBounds(p Player) (lBound, uBound uint8) {
 	return
 }
 
-func (s *State) SelectPit() {
+func (s *Model) SelectPit() {
 	numInPit := s.board[s.selectedPit]
 
 	if numInPit == 0 {
@@ -71,8 +112,31 @@ func (s *State) SelectPit() {
 
 	s.board[s.selectedPit] = 0
 	s.inHand = numInPit
+	s.selectedNum = numInPit
+	s.state = MovingFromHandToPit
+	s.lastSelectedPit[s.currentPlayer] = s.selectedPit
 }
 
-func (s *State) moveFromHandToPit() {
+func (s *Model) moveFromHandToPit() bool {
+	if s.inHand > 0 {
+		pitIndex := (s.selectedPit + 1 + s.selectedNum - s.inHand) % 14
+		log.Printf("pitIndex: %d", pitIndex)
+		s.board[pitIndex]++
+		s.inHand--
+		log.Printf("s.inHand: %d", s.inHand)
+		return false
+	}
 
+	s.state = IsWinner
+	return true
+
+}
+
+func (s *Model) SwitchPlayer() {
+	if s.currentPlayer == P1 {
+		s.currentPlayer = P2
+	} else {
+		s.currentPlayer = P1
+	}
+	log.Printf("Switching player to %d", s.currentPlayer)
 }
