@@ -12,9 +12,11 @@ const (
 	P2
 )
 
+type State uint8
+
 // Game States
 const (
-	SelectingPit uint8 = iota
+	SelectingPit State = iota
 	MovingFromHandToPit
 	IsWinner
 	SwitchPlayer
@@ -29,7 +31,7 @@ type Model struct {
 	lastPlacedPit   uint8
 	inHand          uint8
 	lastSelectedPit map[Player]uint8
-	state           uint8
+	state           State
 }
 
 func NewState() Model {
