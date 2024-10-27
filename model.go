@@ -18,6 +18,7 @@ const (
 	MovingFromHandToPit
 	IsWinner
 	SwitchPlayer
+	Stealing
 	GameOver
 )
 
@@ -33,11 +34,11 @@ type Model struct {
 
 func NewState() Model {
 	return Model{
-		board:           [14]uint8{4, 4, 4, 4, 4, 4, 0, 4, 4, 4, 4, 4, 4, 0},
+		board:           [14]uint8{0, 4, 4, 4, 4, 4, 4, 0, 4, 4, 4, 4, 4, 4},
 		currentPlayer:   P1,
-		lastSelectedPit: map[Player]uint8{P1: 0, P2: 12},
+		lastSelectedPit: map[Player]uint8{P1: 1, P2: 13},
 		state:           SelectingPit,
-		selectedPit:     0,
+		selectedPit:     1,
 	}
 }
 

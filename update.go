@@ -96,7 +96,7 @@ func (s *Model) MoveLeft() {
 
 // getPlayerBounds returns the lower and upper movable bounds of the pits for a given player.
 func getPlayerBounds(p Player) (lBound, uBound uint8) {
-	lBound = uint8(p) * 7
+	lBound = uint8(p)*7 + 1
 	uBound = lBound + 5
 	return
 }
@@ -121,10 +121,9 @@ func (s *Model) moveFromHandToPit() bool {
 	if s.inHand > 0 {
 		pitIndex := (s.selectedPit + 1 + s.selectedNum - s.inHand)
 		if pitIndex == otherStore {
-			// skip the other player's store
-			pitIndex = (pitIndex + 1)
+			pitIndex++
 		}
-		pitIndex = pitIndex % 14
+		pitIndex %= 14
 		s.board[pitIndex]++
 		s.inHand--
 		return false

@@ -9,7 +9,7 @@ import (
 
 func (s Model) View() string {
 	board := s.renderPitRow(P1)
-	board += fmt.Sprintf("%d                      %d\n", s.board[13], s.board[6])
+	board += fmt.Sprintf("%d                      %d\n", s.board[0], s.board[7])
 	board += s.renderPitRow(P2)
 	return board
 }

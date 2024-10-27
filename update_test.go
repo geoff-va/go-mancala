@@ -13,18 +13,18 @@ func TestMoveRight(t *testing.T) {
 		expectedPit uint8
 		player      Player
 	}{
-		{"Right1P1", 1, 1, P1},
-		{"Right2P1", 2, 2, P1},
-		{"Right3P1", 3, 3, P1},
-		{"Right4P1", 4, 4, P1},
-		{"Right5P1", 5, 5, P1},
-		{"Right6P2", 6, 0, P1},
-		{"Right1P2", 1, 11, P2},
-		{"Right2P2", 2, 10, P2},
-		{"Right3P2", 3, 9, P2},
-		{"Right4P2", 4, 8, P2},
-		{"Right5P2", 5, 7, P2},
-		{"Right6P2", 6, 12, P2},
+		{"Right1P1", 1, 2, P1},
+		{"Right2P1", 2, 3, P1},
+		{"Right3P1", 3, 4, P1},
+		{"Right4P1", 4, 5, P1},
+		{"Right5P1", 5, 6, P1},
+		{"Right6P2", 6, 1, P1},
+		{"Right1P2", 1, 12, P2},
+		{"Right2P2", 2, 11, P2},
+		{"Right3P2", 3, 10, P2},
+		{"Right4P2", 4, 9, P2},
+		{"Right5P2", 5, 8, P2},
+		{"Right6P2", 6, 13, P2},
 	}
 	assert := assert.New(t)
 
@@ -51,18 +51,18 @@ func TestMoveLeft(t *testing.T) {
 		player      Player
 	}{
 
-		{"Left1P1", 1, 5, P1},
-		{"Left2P1", 2, 4, P1},
-		{"Left3P1", 3, 3, P1},
-		{"Left4P1", 4, 2, P1},
-		{"Left5P1", 5, 1, P1},
-		{"Left6P1", 6, 0, P1},
-		{"Left2P1", 1, 7, P2},
-		{"Left2P2", 2, 8, P2},
-		{"Left3P2", 3, 9, P2},
-		{"Left4P2", 4, 10, P2},
-		{"Left5P2", 5, 11, P2},
-		{"Left6P2", 6, 12, P2},
+		{"Left1P1", 1, 6, P1},
+		{"Left2P1", 2, 5, P1},
+		{"Left3P1", 3, 4, P1},
+		{"Left4P1", 4, 3, P1},
+		{"Left5P1", 5, 2, P1},
+		{"Left6P1", 6, 1, P1},
+		{"Left2P1", 1, 8, P2},
+		{"Left2P2", 2, 9, P2},
+		{"Left3P2", 3, 10, P2},
+		{"Left4P2", 4, 11, P2},
+		{"Left5P2", 5, 12, P2},
+		{"Left6P2", 6, 13, P2},
 	}
 	assert := assert.New(t)
 
