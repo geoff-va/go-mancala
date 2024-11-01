@@ -6,12 +6,18 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
-// Testing Moving right and wrapping around
 func TestHandleMoveRight(t *testing.T) {
 	state := NewState()
 	newState := state.HandleMoveRight()
 	assert.Equal(t, SelectingPit, newState, "state")
-	assert.Equal(t, state.selectedPit, uint8(2), "selectedPit")
+	assert.Equal(t, uint8(2), state.selectedPit, "selectedPit")
+}
+
+func TestHandleMoveLeft(t *testing.T) {
+	state := NewState()
+	newState := state.HandleMoveLeft()
+	assert.Equal(t, SelectingPit, newState, "state")
+	assert.Equal(t, uint8(6), state.selectedPit, "selectedPit")
 }
 
 func TestMoveLeft(t *testing.T) {
