@@ -90,7 +90,7 @@ func (b *Board) MoveFromHandToPit(inHand, lastPlacedPit uint8, currentPlayer Pla
 	var pitIndex uint8
 	logger.Info("lastPlacedPit", lastPlacedPit)
 	if lastPlacedPit == 0 {
-		pitIndex = 13
+		pitIndex = uint8(len(b.board) - 1)
 	} else {
 		pitIndex = lastPlacedPit - 1
 	}
@@ -104,7 +104,7 @@ func (b *Board) MoveFromHandToPit(inHand, lastPlacedPit uint8, currentPlayer Pla
 		// TODO: Can I refactor this to make it more simple?
 		if pitIndex == otherStore {
 			if pitIndex == 0 {
-				pitIndex = 13
+				pitIndex = uint8(len(b.board) - 1)
 			} else {
 				pitIndex--
 			}
@@ -160,7 +160,7 @@ func (b Board) GetFirstNonEmptyPit(player Player) uint8 {
 	startPit := uint8(1)
 	sign := 1
 	if player == P2 {
-		startPit = 13
+		startPit = uint8(len(b.board) - 1)
 		sign = -1
 	}
 	for i := range 6 {
