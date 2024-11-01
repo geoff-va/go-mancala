@@ -129,8 +129,10 @@ func (b *Board) MoveFromHandToPit(inHand, lastPlacedPit uint8, currentPlayer Pla
 }
 
 func (b *Board) Steal(currentPlayer Player, lastPlacedPit uint8) {
+	// TODO: Validate lastPlacedPit has 1 stone
 	oppositePit := b.GetOppositePit(lastPlacedPit)
-	b.board[b.getStoreIndex(currentPlayer)] += b.board[oppositePit] + 1
+	toAdd := b.board[oppositePit] + b.board[lastPlacedPit]
+	b.addToStore(currentPlayer, toAdd)
 	b.board[oppositePit] = 0
 	b.board[lastPlacedPit] = 0
 }
@@ -181,4 +183,12 @@ func (b Board) GetFirstNonEmptyPit(player Player) uint8 {
 		}
 	}
 	panic("no stones in any of the player's pits")
+}
+
+func (b *Board) addToStore(player Player, numStones uint8) {
+	b.board[b.getStoreIndex(player)] += numStones
+}
+
+func (b Board) GetNumInStore(player Player) uint8 {
+	return b.board[b.getStoreIndex(player)]
 }
