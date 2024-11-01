@@ -36,7 +36,7 @@ func (b *Board) Set(idx, val uint8) {
 	b.board[idx] = val
 }
 
-func (b *Board) Get(idx uint8) uint8 {
+func (b Board) Get(idx uint8) uint8 {
 	return b.board[idx]
 }
 
