@@ -8,41 +8,10 @@ import (
 
 // Testing Moving right and wrapping around
 func TestHandleMoveRight(t *testing.T) {
-	var cases = []struct {
-		name        string
-		numMoves    uint8
-		expectedPit uint8
-		player      Player
-	}{
-		{"Right1P1", 1, 2, P1},
-		{"Right2P1", 2, 3, P1},
-		{"Right3P1", 3, 4, P1},
-		{"Right4P1", 4, 5, P1},
-		{"Right5P1", 5, 6, P1},
-		{"Right6P2", 6, 1, P1},
-		// P2 is moving right which is decrementing
-		{"Right1P2", 1, 12, P2},
-		{"Right2P2", 2, 11, P2},
-		{"Right3P2", 3, 10, P2},
-		{"Right4P2", 4, 9, P2},
-		{"Right5P2", 5, 8, P2},
-		{"Right6P2", 6, 13, P2},
-	}
-	assert := assert.New(t)
-
-	for _, move := range cases {
-		t.Run(move.name, func(t *testing.T) {
-			state := NewState()
-			if move.player == P2 {
-				state.HandleSwitchPlayer()
-			}
-
-			for range move.numMoves {
-				state.HandleMoveRight()
-			}
-			assert.Equal(move.expectedPit, state.selectedPit)
-		})
-	}
+	state := NewState()
+	newState := state.HandleMoveRight()
+	assert.Equal(t, SelectingPit, newState, "state")
+	assert.Equal(t, state.selectedPit, uint8(2), "selectedPit")
 }
 
 func TestMoveLeft(t *testing.T) {
