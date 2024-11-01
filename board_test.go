@@ -72,7 +72,7 @@ func TestSelectPit(t *testing.T) {
 }
 
 // P1 stealing from P2 adds both to P1's store
-func TestStealP1(t *testing.T) {
+func TestSteal_P1(t *testing.T) {
 	board := NewBoardWithOverrideState(map[uint8]uint8{1: 1})
 
 	board.Steal(P1, 1)
@@ -84,7 +84,7 @@ func TestStealP1(t *testing.T) {
 }
 
 // P2 stealing from P1 adds both to P2's store
-func TestStealP2(t *testing.T) {
+func TestSteal_P2(t *testing.T) {
 	board := NewBoardWithOverrideState(map[uint8]uint8{13: 1})
 
 	board.Steal(P2, 13)
@@ -93,4 +93,42 @@ func TestStealP2(t *testing.T) {
 	assert.Equal(t, uint8(0), board.Get(13), "Num now in oppositePit")
 	assert.Equal(t, uint8(5), board.GetNumInStore(P2), "Num in players store")
 	assert.Equal(t, uint8(0), board.GetNumInStore(P1), "Num in other players store")
+}
+
+func TestMoveFromHandToPit_MoreInHand(t *testing.T) {
+	board := NewBoard()
+
+	inHand, lastPlacedPit := board.MoveFromHandToPit(uint8(5), 2, P1)
+
+	assert.Equal(t, uint8(4), inHand, "inHand")
+	assert.Equal(t, uint8(1), lastPlacedPit, "lastPlacedPit")
+}
+
+func TestMoveFromHandToPit_NoneLeftInHand(t *testing.T) {
+	board := NewBoard()
+
+	inHand, lastPlacedPit := board.MoveFromHandToPit(uint8(0), 2, P1)
+
+	assert.Equal(t, uint8(0), inHand, "inHand")
+	assert.Equal(t, uint8(2), lastPlacedPit, "lastPlacedPit")
+}
+
+// Skips P2 Store
+func TestMoveFromHandToPit_P1NextPitIsP2Store(t *testing.T) {
+	board := NewBoard()
+
+	inHand, lastPlacedPit := board.MoveFromHandToPit(uint8(5), 8, P1)
+
+	assert.Equal(t, uint8(4), inHand, "inHand")
+	assert.Equal(t, uint8(6), lastPlacedPit, "lastPlacedPit")
+}
+
+// Skips P1 Store
+func TestMoveFromHandToPit_P2NextPitIsP1Store(t *testing.T) {
+	board := NewBoard()
+
+	inHand, lastPlacedPit := board.MoveFromHandToPit(uint8(5), 1, P2)
+
+	assert.Equal(t, uint8(4), inHand, "inHand")
+	assert.Equal(t, uint8(13), lastPlacedPit, "lastPlacedPit")
 }
