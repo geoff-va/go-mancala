@@ -20,45 +20,6 @@ func TestHandleMoveLeft(t *testing.T) {
 	assert.Equal(t, uint8(6), state.selectedPit, "selectedPit")
 }
 
-func TestMoveLeft(t *testing.T) {
-	var cases = []struct {
-		name        string
-		numMoves    uint8
-		expectedPit uint8
-		player      Player
-	}{
-
-		{"Left1P1", 1, 6, P1},
-		{"Left2P1", 2, 5, P1},
-		{"Left3P1", 3, 4, P1},
-		{"Left4P1", 4, 3, P1},
-		{"Left5P1", 5, 2, P1},
-		{"Left6P1", 6, 1, P1},
-		// P2 is moving right which is incrementing
-		{"Left2P1", 1, 8, P2},
-		{"Left2P2", 2, 9, P2},
-		{"Left3P2", 3, 10, P2},
-		{"Left4P2", 4, 11, P2},
-		{"Left5P2", 5, 12, P2},
-		{"Left6P2", 6, 13, P2},
-	}
-	assert := assert.New(t)
-
-	for _, move := range cases {
-		t.Run(move.name, func(t *testing.T) {
-			state := NewState()
-			if move.player == P2 {
-				state.HandleSwitchPlayer()
-			}
-
-			for range move.numMoves {
-				state.HandleMoveLeft()
-			}
-			assert.Equal(move.expectedPit, state.selectedPit)
-		})
-	}
-}
-
 func TestSwitchPlayer(t *testing.T) {
 	assert := assert.New(t)
 	state := NewState()

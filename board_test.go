@@ -13,11 +13,12 @@ func TestMoveRight(t *testing.T) {
 		expectedPit uint8
 		player      Player
 	}{
-		{"Right1P1", 1, 2, P1},
-		{"Right6P2", 6, 1, P1},
-		// P2 is moving right which is decrementing
-		{"Right6P2", 12, 11, P2},
-		{"Right1P2", 8, 13, P2},
+		// P1 is incrementing
+		{"RightP1", 1, 2, P1},
+		{"RightWrapP1", 6, 1, P1},
+		// P2 is decrementing
+		{"RightP2", 12, 11, P2},
+		{"RightWrapP2", 8, 13, P2},
 	}
 	assert := assert.New(t)
 
@@ -26,6 +27,34 @@ func TestMoveRight(t *testing.T) {
 			board := NewBoard()
 
 			newPit := board.MoveRight(move.startPit, move.player)
+
+			assert.Equal(move.expectedPit, newPit, move.name)
+		})
+	}
+}
+
+func TestMoveLeft(t *testing.T) {
+	var cases = []struct {
+		name        string
+		startPit    uint8
+		expectedPit uint8
+		player      Player
+	}{
+
+		// P1 is decrementing
+		{"LeftP1", 1, 6, P1},
+		{"LeftWrapP1", 2, 1, P1},
+		// P2 is incrementing
+		{"LeftP2", 8, 9, P2},
+		{"LeftWrapP2", 13, 8, P2},
+	}
+	assert := assert.New(t)
+
+	for _, move := range cases {
+		t.Run(move.name, func(t *testing.T) {
+			board := NewBoard()
+
+			newPit := board.MoveLeft(move.startPit, move.player)
 
 			assert.Equal(move.expectedPit, newPit, move.name)
 		})
