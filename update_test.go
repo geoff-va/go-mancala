@@ -30,7 +30,7 @@ func TestSwitchPlayer(t *testing.T) {
 	assert.Equal(P1, state.currentPlayer)
 }
 
-func TestSelectPit(t *testing.T) {
+func TestHandleSelectPit(t *testing.T) {
 	assert := assert.New(t)
 	state := NewState()
 

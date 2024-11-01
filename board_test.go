@@ -60,3 +60,13 @@ func TestMoveLeft(t *testing.T) {
 		})
 	}
 }
+
+func TestSelectPit(t *testing.T) {
+	board := NewBoard()
+	wasInPit := board.Get(1)
+
+	inHand := board.SelectPit(1)
+
+	assert.Equal(t, wasInPit, inHand, "Num now in hand")
+	assert.Equal(t, uint8(0), board.Get(1), "Num now in pit")
+}
