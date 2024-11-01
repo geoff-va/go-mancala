@@ -151,14 +151,6 @@ func (s Board) getStoreIndex(player Player) uint8 {
 	return (uint8(player) * 7)
 }
 
-func (s Model) getNextNonEmptyPit() string {
-	return "hello"
-}
-
-func (b Board) GetLastPlacedPit() uint8 {
-	return b.lastPlacedPit
-}
-
 func (b Board) GetPlayerForPit(pit uint8) Player {
 	if pit < 7 {
 		return P1
