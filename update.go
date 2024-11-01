@@ -82,13 +82,14 @@ func (s *Model) HandleSelectPit() State {
 }
 
 func (s *Model) HandleMoveFromHandToPit() State {
+	// BUG: handle game ending in own store gets another turn but no stones left
 	s.inHand, s.lastPlacedPit = s.board.MoveFromHandToPit(s.inHand, s.lastPlacedPit, s.currentPlayer)
 
 	if s.inHand > 0 {
 		return MovingFromHandToPit
 	}
 
-	// You get another turn if you end in your store
+	// Rule: You get another turn if you end in your store
 	if s.board.IsPlayersStore(s.lastPlacedPit, s.currentPlayer) {
 		return SelectingPit
 	}
