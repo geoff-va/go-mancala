@@ -20,6 +20,18 @@ func NewBoard() Board {
 	}
 }
 
+func NewBoardWithState(state [14]uint8) Board {
+	return Board{board: state}
+}
+
+func NewBoardWithOverrideState(state map[uint8]uint8) Board {
+	newState := [14]uint8{0, 4, 4, 4, 4, 4, 4, 0, 4, 4, 4, 4, 4, 4}
+	for idx, val := range state {
+		newState[idx] = val
+	}
+	return Board{board: newState}
+}
+
 func (b *Board) Set(idx, val uint8) {
 	b.board[idx] = val
 }
@@ -88,13 +100,13 @@ func (b *Board) SelectPit(pit uint8) uint8 {
 func (b *Board) MoveFromHandToPit(inHand, lastPlacedPit uint8, currentPlayer Player) (uint8, uint8) {
 	// get next pit we're going to place a stone in
 	var pitIndex uint8
-	logger.Info("lastPlacedPit", lastPlacedPit)
+	logger.Info("lastPlacedPit", "value", lastPlacedPit)
 	if lastPlacedPit == 0 {
 		pitIndex = uint8(len(b.board) - 1)
 	} else {
 		pitIndex = lastPlacedPit - 1
 	}
-	logger.Info("pitIndex", pitIndex)
+	logger.Info("pitIndex", "value", pitIndex)
 
 	otherPlayer := Player((currentPlayer + 1) % 2)
 	otherStore := b.getStoreIndex(otherPlayer)
