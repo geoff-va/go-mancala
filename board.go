@@ -98,34 +98,35 @@ func (b *Board) SelectPit(pit uint8) uint8 {
 }
 
 func (b *Board) MoveFromHandToPit(inHand, lastPlacedPit uint8, currentPlayer Player) (uint8, uint8) {
-	// get next pit we're going to place a stone in
-	var pitIndex uint8
-	logger.Info("lastPlacedPit", "value", lastPlacedPit)
-	if lastPlacedPit == 0 {
-		pitIndex = uint8(len(b.board) - 1)
-	} else {
-		pitIndex = lastPlacedPit - 1
+	if inHand == 0 {
+		return 0, lastPlacedPit
 	}
-	logger.Info("pitIndex", "value", pitIndex)
+	nextPitIndex := b.getNextPit(lastPlacedPit, currentPlayer)
+	inHand--
+	b.board[nextPitIndex]++
+	return inHand, nextPitIndex
+}
 
-	otherPlayer := Player((currentPlayer + 1) % 2)
+func (b Board) getNextPit(currentPit uint8, player Player) uint8 {
+	var nextPit uint8
+	if currentPit == 0 {
+		nextPit = uint8(len(b.board) - 1)
+	} else {
+		nextPit = currentPit - 1
+	}
+
+	otherPlayer := Player((player + 1) % 2)
 	otherStore := b.getStoreIndex(otherPlayer)
 
-	if inHand > 0 {
-		// Rule: We don't place stones in the other players store
-		// TODO: Can I refactor this to make it more simple?
-		if pitIndex == otherStore {
-			if pitIndex == 0 {
-				pitIndex = uint8(len(b.board) - 1)
-			} else {
-				pitIndex--
-			}
+	if nextPit == otherStore {
+		if nextPit == 0 {
+			nextPit = uint8(len(b.board) - 1)
+		} else {
+			nextPit--
 		}
-		inHand--
-		b.board[pitIndex]++
-		lastPlacedPit = pitIndex
 	}
-	return inHand, lastPlacedPit
+	return nextPit
+
 }
 
 func (b *Board) Steal(currentPlayer Player, lastPlacedPit uint8) {
