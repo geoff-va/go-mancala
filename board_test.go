@@ -70,3 +70,14 @@ func TestSelectPit(t *testing.T) {
 	assert.Equal(t, wasInPit, inHand, "Num now in hand")
 	assert.Equal(t, uint8(0), board.Get(1), "Num now in pit")
 }
+
+// Stealing from player adds yours and theirs to your store
+func TestSteal(t *testing.T) {
+	board := NewBoardWithOverrideState(map[uint8]uint8{1: 1})
+
+	board.Steal(P1, 1)
+
+	assert.Equal(t, uint8(0), board.Get(1), "Num in lastPlacedPit")
+	assert.Equal(t, uint8(0), board.Get(13), "Num now in oppositePit")
+	assert.Equal(t, uint8(5), board.GetNumInStore(P1), "Num in players store")
+}
