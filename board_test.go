@@ -6,6 +6,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+// Moves right, wrapping as necessary
 func TestMoveRight(t *testing.T) {
 	var cases = []struct {
 		name        string
@@ -33,6 +34,31 @@ func TestMoveRight(t *testing.T) {
 	}
 }
 
+// Moves right, Skipping empty pits
+func TestMoveRight_SkipsEmptyPits(t *testing.T) {
+	var cases = []struct {
+		name        string
+		startPit    uint8
+		state       map[uint8]uint8
+		player      Player
+		expectedPit uint8
+	}{
+		// P1 is incrementing
+		{"Skip1P1", 1, map[uint8]uint8{2: 0}, P1, 3},
+		{"Skip2P1", 1, map[uint8]uint8{2: 0, 3: 0}, P1, 4},
+		{"SkipAndWrapP1", 5, map[uint8]uint8{6: 0}, P1, 1},
+	}
+	for _, tcase := range cases {
+		t.Run(tcase.name, func(t *testing.T) {
+			assert := assert.New(t)
+			board := NewBoardWithOverrideState(tcase.state)
+			newPit := board.MoveRight(tcase.startPit, tcase.player)
+			assert.Equal(uint8(tcase.expectedPit), newPit)
+		})
+	}
+}
+
+// Moces left, wrapping as necessary
 func TestMoveLeft(t *testing.T) {
 	var cases = []struct {
 		name        string
@@ -61,6 +87,7 @@ func TestMoveLeft(t *testing.T) {
 	}
 }
 
+// Returns number in pit and sets pit to 0
 func TestSelectPit(t *testing.T) {
 	board := NewBoard()
 	wasInPit := board.Get(1)
@@ -95,6 +122,7 @@ func TestSteal_P2(t *testing.T) {
 	assert.Equal(t, uint8(0), board.GetNumInStore(P1), "Num in other players store")
 }
 
+// Returns one less stone in hand and next pit
 func TestMoveFromHandToPit_MoreInHand(t *testing.T) {
 	board := NewBoard()
 
@@ -104,6 +132,7 @@ func TestMoveFromHandToPit_MoreInHand(t *testing.T) {
 	assert.Equal(t, uint8(1), lastPlacedPit, "lastPlacedPit")
 }
 
+// If nothing left in hand, returns the same pit and 0 inHand
 func TestMoveFromHandToPit_NoneLeftInHand(t *testing.T) {
 	board := NewBoard()
 
@@ -133,6 +162,7 @@ func TestMoveFromHandToPit_P2NextPitIsP1Store(t *testing.T) {
 	assert.Equal(t, uint8(13), lastPlacedPit, "lastPlacedPit")
 }
 
+// Collects all stones into players's store who will has stones on the board
 func TestCollectRemainder(t *testing.T) {
 	var cases = []struct {
 		name                string
@@ -156,4 +186,12 @@ func TestCollectRemainder(t *testing.T) {
 			assert.Equal(uint8(0), board.GetNumInStore(tcase.playerWithoutStones), "Player Without Stones")
 		})
 	}
+}
+
+// Should panic if both players still have stones on the board
+func TestCollectRemainder_PanicsWhenBothPlayersHaveStons(t *testing.T) {
+	defer func() { _ = recover() }()
+	board := NewBoard()
+	board.CollectRemainder()
+	t.Errorf("should have panicked")
 }
