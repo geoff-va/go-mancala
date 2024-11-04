@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"log/slog"
 	"os"
 )
@@ -29,17 +30,15 @@ func NewBoardWithOverrideState(state map[uint8]uint8) Board {
 	for idx, val := range state {
 		newState[idx] = val
 	}
-	return Board{board: newState}
+	return NewBoardWithState(newState)
 }
 
-func (b *Board) Set(idx, val uint8) {
-	b.board[idx] = val
+// Get returns the numver of stones at the pit index
+func (b Board) Get(pit uint8) uint8 {
+	return b.board[pit]
 }
 
-func (b Board) Get(idx uint8) uint8 {
-	return b.board[idx]
-}
-
+// MoveLeft moves the selected pit to the left, skipping empty pits
 func (b Board) MoveLeft(selectedPit uint8, currentPlayer Player) uint8 {
 	lBound, uBound := getPlayerBounds(currentPlayer)
 	for range 6 {
@@ -63,6 +62,7 @@ func (b Board) MoveLeft(selectedPit uint8, currentPlayer Player) uint8 {
 	return selectedPit
 }
 
+// MoveRight moves the selected pit to the right, skipping empty pits
 func (m *Board) MoveRight(selectedPit uint8, currentPlayer Player) uint8 {
 	lBound, uBound := getPlayerBounds(currentPlayer)
 	for range 6 {
@@ -86,6 +86,7 @@ func (m *Board) MoveRight(selectedPit uint8, currentPlayer Player) uint8 {
 	return selectedPit
 }
 
+// SelectPit removes all stones from a pit and returns the number of stones
 func (b *Board) SelectPit(pit uint8) uint8 {
 	numInPit := b.board[pit]
 
@@ -97,6 +98,8 @@ func (b *Board) SelectPit(pit uint8) uint8 {
 	return numInPit
 }
 
+// MoveFromHandToPit moves a stone from the hand to the pit, returning number left in
+// the hand and the last pit placed in
 func (b *Board) MoveFromHandToPit(inHand, lastPlacedPit uint8, currentPlayer Player) (uint8, uint8) {
 	if inHand == 0 {
 		return 0, lastPlacedPit
@@ -107,6 +110,8 @@ func (b *Board) MoveFromHandToPit(inHand, lastPlacedPit uint8, currentPlayer Pla
 	return inHand, nextPitIndex
 }
 
+// getNextPit returns the next pit to place a stone in based on the current pit and
+// player
 func (b Board) getNextPit(currentPit uint8, player Player) uint8 {
 	var nextPit uint8
 	if currentPit == 0 {
@@ -184,4 +189,26 @@ func (b *Board) addToStore(player Player, numStones uint8) {
 
 func (b Board) GetNumInStore(player Player) uint8 {
 	return b.board[b.getStoreIndex(player)]
+}
+
+// CollectRemainder moves remaining stones to that players side
+func (b *Board) CollectRemainder() {
+	p1, p2 := uint8(0), uint8(0)
+
+	for i := range 6 {
+		p1Index, p2Index := uint8(i+1), uint8(i+8)
+		p1 += b.board[p1Index]
+		b.board[p1Index] = 0
+
+		p2 += b.board[p2Index]
+		b.board[p2Index] = 0
+	}
+
+	if p1 == 0 {
+		b.board[b.getStoreIndex(P2)] += p2
+	} else if p2 == 0 {
+		b.board[b.getStoreIndex(P1)] += p1
+	} else {
+		panic(fmt.Sprintf("Both players have stones left. p1: %d, p2: %d", p1, p2))
+	}
 }

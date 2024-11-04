@@ -113,7 +113,7 @@ func TestMoveFromHandToPit_NoneLeftInHand(t *testing.T) {
 	assert.Equal(t, uint8(2), lastPlacedPit, "lastPlacedPit")
 }
 
-// Skips P2 Store
+// Skips P2 Store if P1's Turn
 func TestMoveFromHandToPit_P1NextPitIsP2Store(t *testing.T) {
 	board := NewBoard()
 
@@ -123,7 +123,7 @@ func TestMoveFromHandToPit_P1NextPitIsP2Store(t *testing.T) {
 	assert.Equal(t, uint8(6), lastPlacedPit, "lastPlacedPit")
 }
 
-// Skips P1 Store
+// Skips P1 Store if P2's Turne
 func TestMoveFromHandToPit_P2NextPitIsP1Store(t *testing.T) {
 	board := NewBoard()
 
@@ -131,4 +131,29 @@ func TestMoveFromHandToPit_P2NextPitIsP1Store(t *testing.T) {
 
 	assert.Equal(t, uint8(4), inHand, "inHand")
 	assert.Equal(t, uint8(13), lastPlacedPit, "lastPlacedPit")
+}
+
+func TestCollectRemainder(t *testing.T) {
+	var cases = []struct {
+		name                string
+		playerWithoutStones Player
+		playerWithStones    Player
+	}{
+		{"P1", P1, P2},
+		{"P2", P2, P1},
+	}
+	for _, tcase := range cases {
+		t.Run(tcase.name, func(t *testing.T) {
+			assert := assert.New(t)
+			offset := uint8(tcase.playerWithoutStones) * 7
+			board := NewBoardWithOverrideState(map[uint8]uint8{
+				offset + 1: 0, offset + 2: 0, offset + 3: 0,
+				offset + 4: 0, offset + 5: 0, offset + 6: 0})
+
+			board.CollectRemainder()
+
+			assert.Equal(uint8(6*4), board.GetNumInStore(tcase.playerWithStones), "Player With Stones")
+			assert.Equal(uint8(0), board.GetNumInStore(tcase.playerWithoutStones), "Player Without Stones")
+		})
+	}
 }
