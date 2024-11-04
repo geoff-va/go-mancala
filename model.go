@@ -18,10 +18,11 @@ type State uint8
 const (
 	SelectingPit State = iota
 	MovingFromHandToPit
-	IsWinner
+	DoneMoving
 	SwitchPlayer
 	Stealing
 	GameOver
+	CollectRemainder
 )
 
 type Model struct {
@@ -32,7 +33,6 @@ type Model struct {
 	inHand        uint8
 	state         State
 	winner        Player
-	isWinner      bool
 }
 
 func NewState() Model {

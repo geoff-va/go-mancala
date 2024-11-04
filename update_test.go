@@ -53,7 +53,7 @@ func TestMovingFromHandToPit_HandNotEmpty(t *testing.T) {
 
 }
 
-func TestMovingFromHandToPit_EmptyHandTurnOver(t *testing.T) {
+func TestHandleMovingFromHandToPit_EmptyHandTurnOver(t *testing.T) {
 	state := NewState()
 
 	state.state = state.HandleSelectPit()

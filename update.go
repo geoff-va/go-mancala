@@ -42,19 +42,23 @@ func (s Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		}
 	case MovingFromHandToPit:
 		nextState = s.HandleMoveFromHandToPit()
-		if nextState == MovingFromHandToPit || nextState == Stealing {
+		cmd = doTick(500)
+	case DoneMoving:
+		nextState = s.HandleDoneMoving()
+		if nextState == Stealing || nextState == CollectRemainder {
 			cmd = doTick(500)
 		} else {
 			cmd = doTick(1)
 		}
+		cmd = doTick(1)
 	case Stealing:
 		nextState = s.HandleSteal()
 		cmd = doTick(1)
-	case IsWinner:
-		nextState = s.HandleIsWinner()
-		cmd = doTick(1)
 	case SwitchPlayer:
 		nextState = s.HandleSwitchPlayer()
+		cmd = doTick(1)
+	case CollectRemainder:
+		nextState = s.HandleCollectRemainder()
 		cmd = doTick(1)
 	case GameOver:
 		return s, tea.Quit
@@ -65,7 +69,6 @@ func (s Model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 }
 
 func (s *Model) HandleMoveRight() State {
-	// TODO: handle moving past empty pits
 	s.selectedPit = s.board.MoveRight(s.selectedPit, s.currentPlayer)
 	return SelectingPit
 }
@@ -82,28 +85,40 @@ func (s *Model) HandleSelectPit() State {
 }
 
 func (s *Model) HandleMoveFromHandToPit() State {
-	// BUG: handle game ending in own store gets another turn but no stones left
 	s.inHand, s.lastPlacedPit = s.board.MoveFromHandToPit(s.inHand, s.lastPlacedPit, s.currentPlayer)
 
 	if s.inHand > 0 {
 		return MovingFromHandToPit
 	}
 
+	return DoneMoving
+}
+
+func (m *Model) HandleDoneMoving() State {
+	gameOver := m.isGameOver()
+	if gameOver {
+		return CollectRemainder
+	}
+
 	// Rule: You get another turn if you end in your store
-	if s.board.IsPlayersStore(s.lastPlacedPit, s.currentPlayer) {
+	if m.board.IsPlayersStore(m.lastPlacedPit, m.currentPlayer) {
 		return SelectingPit
 	}
 
-	// Turn over
-	if s.board.GetPlayerForPit(s.lastPlacedPit) != s.currentPlayer ||
-		s.board.IsPlayersStore(s.lastPlacedPit, s.currentPlayer) ||
-		s.board.Get(s.lastPlacedPit) != 1 ||
-		s.board.Get(s.board.GetOppositePit(s.lastPlacedPit)) == 0 {
-		return IsWinner
+	// Rule: Steal if last stone landed in empty pit on your side and the the opposite
+	// pit has stones in it
+	if m.board.GetPlayerForPit(m.lastPlacedPit) == m.currentPlayer &&
+		m.board.Get(m.lastPlacedPit) == 1 &&
+		m.board.Get(m.board.GetOppositePit(m.lastPlacedPit)) > 0 {
+		return Stealing
 	}
 
-	return Stealing
+	return SwitchPlayer
+}
 
+func (m *Model) HandleCollectRemainder() State {
+	m.board.CollectRemainder()
+	return GameOver
 }
 
 func (s *Model) HandleSwitchPlayer() State {
@@ -119,33 +134,17 @@ func (s *Model) HandleSwitchPlayer() State {
 
 func (s *Model) HandleSteal() State {
 	s.board.Steal(s.currentPlayer, s.lastPlacedPit)
-	return IsWinner
+	return SwitchPlayer
 }
 
-func (s Model) HandleIsWinner() State {
-	p1wins := true
-	p2wins := true
+func (s Model) isGameOver() bool {
+	p1Empty := true
+	p2Empty := true
 
 	for i := range 5 {
-		p1wins = p1wins && s.board.Get(uint8(i+1)) == 0
-		p2wins = p2wins && s.board.Get(uint8(i+7)) == 0
+		p1Empty = p1Empty && s.board.Get(uint8(i+1)) == 0
+		p2Empty = p2Empty && s.board.Get(uint8(i+7)) == 0
 	}
 
-	if p1wins {
-		s.winner = P1
-		s.isWinner = true
-
-	}
-
-	if p2wins {
-		s.winner = P2
-		s.isWinner = true
-	}
-
-	if s.isWinner {
-		return GameOver
-	}
-
-	return SwitchPlayer
-
+	return p1Empty || p2Empty
 }
