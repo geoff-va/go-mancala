@@ -151,7 +151,6 @@ func TestHandleCollectRemainder_P1Empty(t *testing.T) {
 	for i := range 6 {
 		assert.Equal(t, uint8(0), state.board.Get(uint8(i+1)), fmt.Sprintf("P1 side: %d", i))
 		assert.Equal(t, uint8(0), state.board.Get(uint8(i+8)), fmt.Sprintf("P2 side: %d", i))
-
 	}
 }
 
@@ -170,6 +169,35 @@ func TestHandleCollectRemainder_P2Empty(t *testing.T) {
 	for i := range 6 {
 		assert.Equal(t, uint8(0), state.board.Get(uint8(i+1)), fmt.Sprintf("P1 side: %d", i))
 		assert.Equal(t, uint8(0), state.board.Get(uint8(i+8)), fmt.Sprintf("P2 side: %d", i))
-
 	}
+}
+
+func TestHandleSteal_P1FromP2(t *testing.T) {
+	state := NewModelWithState([14]uint8{
+		10, 1, 1, 1, 1, 1, 1,
+		1, 1, 1, 1, 1, 1, 5,
+	})
+	state.lastPlacedPit = 1
+	state.currentPlayer = P1
+	nextState := state.HandleSteal()
+
+	assert.Equal(t, SwitchPlayer, nextState, "next state")
+	assert.Equal(t, uint8(0), state.board.Get(1), "Num in pit 1")
+	assert.Equal(t, uint8(0), state.board.Get(13), "Num in pit 13")
+	assert.Equal(t, uint8(16), state.board.GetNumInStore(P1), "Num in P1 Store")
+}
+
+func TestHandleSteal_P2FromP1(t *testing.T) {
+	state := NewModelWithState([14]uint8{
+		1, 1, 1, 1, 1, 1, 5,
+		10, 1, 1, 1, 1, 1, 1,
+	})
+	state.lastPlacedPit = 8
+	state.currentPlayer = P2
+	nextState := state.HandleSteal()
+
+	assert.Equal(t, SwitchPlayer, nextState, "next state")
+	assert.Equal(t, uint8(0), state.board.Get(8), "Num in pit 8")
+	assert.Equal(t, uint8(0), state.board.Get(6), "Num in pit 6")
+	assert.Equal(t, uint8(16), state.board.GetNumInStore(P2), "Num in P2 Store")
 }
