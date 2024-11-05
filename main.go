@@ -22,7 +22,7 @@ func main() {
 		os.Exit(0)
 	}
 
-	p := tea.NewProgram(NewState())
+	p := tea.NewProgram(NewModel())
 	if _, err := p.Run(); err != nil {
 		fmt.Printf("Error starting program: %v", err)
 		os.Exit(1)

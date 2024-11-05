@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"time"
 
 	tea "github.com/charmbracelet/bubbletea"
@@ -95,6 +96,10 @@ func (s *Model) HandleMoveFromHandToPit() State {
 }
 
 func (m *Model) HandleDoneMoving() State {
+	if m.inHand > 0 {
+		panic(fmt.Sprintf("inHand should be 0, but is %d", m.inHand))
+	}
+
 	gameOver := m.isGameOver()
 	if gameOver {
 		return CollectRemainder
@@ -102,6 +107,7 @@ func (m *Model) HandleDoneMoving() State {
 
 	// Rule: You get another turn if you end in your store
 	if m.board.IsPlayersStore(m.lastPlacedPit, m.currentPlayer) {
+		m.selectedPit = m.board.GetFirstNonEmptyPit(m.currentPlayer)
 		return SelectingPit
 	}
 

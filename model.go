@@ -25,6 +25,26 @@ const (
 	CollectRemainder
 )
 
+func (s State) String() string {
+	switch s {
+	case SelectingPit:
+		return "SelectingPit"
+	case MovingFromHandToPit:
+		return "MovingFromHandToPit"
+	case DoneMoving:
+		return "DoneMoving"
+	case SwitchPlayer:
+		return "SwitchPlayer"
+	case Stealing:
+		return "Stealing"
+	case GameOver:
+		return "GameOver"
+	case CollectRemainder:
+		return "CollectRemainder"
+	}
+	return ""
+}
+
 type Model struct {
 	board         Board
 	selectedPit   uint8
@@ -35,14 +55,14 @@ type Model struct {
 	winner        Player
 }
 
-func NewState() Model {
+func NewModel() Model {
 	return Model{
 		board:         NewBoard(),
 		currentPlayer: P1,
 		selectedPit:   1,
 	}
 }
-func NewStateWithBoard(boardState [14]uint8) Model {
+func NewModelWithState(boardState [14]uint8) Model {
 	return Model{
 		board:         NewBoardWithState(boardState),
 		currentPlayer: P1,
