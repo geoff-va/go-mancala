@@ -7,14 +7,14 @@ import (
 )
 
 func TestHandleMoveRight(t *testing.T) {
-	state := NewState()
+	state := NewModel()
 	newState := state.HandleMoveRight()
 	assert.Equal(t, SelectingPit, newState, "state")
 	assert.Equal(t, uint8(2), state.selectedPit, "selectedPit")
 }
 
 func TestHandleMoveLeft(t *testing.T) {
-	state := NewState()
+	state := NewModel()
 	newState := state.HandleMoveLeft()
 	assert.Equal(t, SelectingPit, newState, "state")
 	assert.Equal(t, uint8(6), state.selectedPit, "selectedPit")
@@ -22,7 +22,7 @@ func TestHandleMoveLeft(t *testing.T) {
 
 func TestSwitchPlayer(t *testing.T) {
 	assert := assert.New(t)
-	state := NewState()
+	state := NewModel()
 	assert.Equal(P1, state.currentPlayer)
 	state.HandleSwitchPlayer()
 	assert.Equal(P2, state.currentPlayer)
@@ -32,7 +32,7 @@ func TestSwitchPlayer(t *testing.T) {
 
 func TestHandleSelectPit(t *testing.T) {
 	assert := assert.New(t)
-	state := NewState()
+	state := NewModel()
 
 	state.HandleMoveRight()
 	nextState := state.HandleSelectPit()
@@ -44,7 +44,7 @@ func TestHandleSelectPit(t *testing.T) {
 }
 
 func TestMovingFromHandToPit_HandNotEmpty(t *testing.T) {
-	state := NewState()
+	state := NewModel()
 
 	state.state = state.HandleSelectPit()
 	nextState := state.HandleMoveFromHandToPit()
@@ -53,7 +53,7 @@ func TestMovingFromHandToPit_HandNotEmpty(t *testing.T) {
 }
 
 func TestHandleMovingFromHandToPit_EmptyHandTurnOver(t *testing.T) {
-	state := NewState()
+	state := NewModel()
 
 	state.state = state.HandleSelectPit()
 	state.state = state.HandleMoveFromHandToPit()
@@ -67,7 +67,7 @@ func TestHandleMovingFromHandToPit_EmptyHandTurnOver(t *testing.T) {
 
 // Turn is over
 func TestHandleDoneMoving_SwitchPlayer(t *testing.T) {
-	state := NewStateWithBoard([14]uint8{
+	state := NewModelWithState([14]uint8{
 		0, 2, 1, 1, 1, 1, 1,
 		0, 1, 1, 1, 1, 1, 1,
 	})
@@ -78,7 +78,7 @@ func TestHandleDoneMoving_SwitchPlayer(t *testing.T) {
 }
 
 func TestHandleDoneMoving_CollectRemainderP1(t *testing.T) {
-	state := NewStateWithBoard([14]uint8{
+	state := NewModelWithState([14]uint8{
 		0, 0, 0, 0, 0, 0, 0,
 		0, 1, 1, 1, 1, 1, 1,
 	})
@@ -88,7 +88,7 @@ func TestHandleDoneMoving_CollectRemainderP1(t *testing.T) {
 }
 
 func TestHandleDoneMoving_CollectRemainderP2(t *testing.T) {
-	state := NewStateWithBoard([14]uint8{
+	state := NewModelWithState([14]uint8{
 		0, 1, 1, 1, 1, 1, 1,
 		0, 0, 0, 0, 0, 0, 0,
 	})
@@ -97,7 +97,17 @@ func TestHandleDoneMoving_CollectRemainderP2(t *testing.T) {
 	assert.Equal(t, CollectRemainder, nextState, "next state")
 }
 
-func TestHandleDoneMoving_SelectingPit(t *testing.T) {
+// Get another turn if you land in your pit
+func TestHandleDoneMoving_SelectingPitP1(t *testing.T) {
+	state := NewModelWithState([14]uint8{
+		1, 1, 1, 1, 1, 1, 1,
+		1, 1, 1, 1, 1, 1, 1,
+	})
+	state.lastPlacedPit = 0
+	nextState := state.HandleDoneMoving()
+
+	assert.Equal(t, SelectingPit, nextState, "next state")
+	assert.Equal(t, uint8(1), state.selectedPit, "selectedPit")
 }
 
 func TestHandleDoneMoving_Stealing(t *testing.T) {
