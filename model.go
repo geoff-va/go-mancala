@@ -42,6 +42,13 @@ func NewState() Model {
 		selectedPit:   1,
 	}
 }
+func NewStateWithBoard(boardState [14]uint8) Model {
+	return Model{
+		board:         NewBoardWithState(boardState),
+		currentPlayer: P1,
+		selectedPit:   1,
+	}
+}
 
 func (s Model) Init() tea.Cmd {
 	return nil
