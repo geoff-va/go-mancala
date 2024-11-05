@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -20,7 +21,7 @@ func TestHandleMoveLeft(t *testing.T) {
 	assert.Equal(t, uint8(6), state.selectedPit, "selectedPit")
 }
 
-func TestSwitchPlayer(t *testing.T) {
+func TestHandleSwitchPlayer(t *testing.T) {
 	assert := assert.New(t)
 	state := NewModel()
 	assert.Equal(P1, state.currentPlayer)
@@ -133,4 +134,42 @@ func TestHandleDoneMoving_StealingP2FromP1(t *testing.T) {
 	nextState := state.HandleDoneMoving()
 
 	assert.Equal(t, Stealing, nextState, "next state")
+}
+
+func TestHandleCollectRemainder_P1Empty(t *testing.T) {
+	state := NewModelWithState([14]uint8{
+		5, 0, 0, 0, 0, 0, 0,
+		10, 1, 1, 1, 1, 1, 1,
+	})
+	state.lastPlacedPit = 9
+	state.currentPlayer = P1
+	nextState := state.HandleCollectRemainder()
+
+	assert.Equal(t, GameOver, nextState, "next state")
+	assert.Equal(t, uint8(16), state.board.GetNumInStore(P2), "Num in P2 Store")
+	assert.Equal(t, uint8(5), state.board.GetNumInStore(P1), "Num in P1 Store")
+	for i := range 6 {
+		assert.Equal(t, uint8(0), state.board.Get(uint8(i+1)), fmt.Sprintf("P1 side: %d", i))
+		assert.Equal(t, uint8(0), state.board.Get(uint8(i+8)), fmt.Sprintf("P2 side: %d", i))
+
+	}
+}
+
+func TestHandleCollectRemainder_P2Empty(t *testing.T) {
+	state := NewModelWithState([14]uint8{
+		10, 1, 1, 1, 1, 1, 1,
+		5, 0, 0, 0, 0, 0, 0,
+	})
+	state.lastPlacedPit = 5
+	state.currentPlayer = P2
+	nextState := state.HandleCollectRemainder()
+
+	assert.Equal(t, GameOver, nextState, "next state")
+	assert.Equal(t, uint8(16), state.board.GetNumInStore(P1), "Num in P1 Store")
+	assert.Equal(t, uint8(5), state.board.GetNumInStore(P2), "Num in P2 Store")
+	for i := range 6 {
+		assert.Equal(t, uint8(0), state.board.Get(uint8(i+1)), fmt.Sprintf("P1 side: %d", i))
+		assert.Equal(t, uint8(0), state.board.Get(uint8(i+8)), fmt.Sprintf("P2 side: %d", i))
+
+	}
 }
