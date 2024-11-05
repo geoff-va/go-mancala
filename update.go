@@ -141,7 +141,7 @@ func (s Model) isGameOver() bool {
 	p1Empty := true
 	p2Empty := true
 
-	for i := range 5 {
+	for i := range 6 {
 		p1Empty = p1Empty && s.board.Get(uint8(i+1)) == 0
 		p2Empty = p2Empty && s.board.Get(uint8(i+7)) == 0
 	}
