@@ -195,3 +195,68 @@ func TestCollectRemainder_PanicsWhenBothPlayersHaveStons(t *testing.T) {
 	board.CollectRemainder()
 	t.Errorf("should have panicked")
 }
+
+func TestGetFirstNonEmptyPit_P1(t *testing.T) {
+	var cases = []struct {
+		name    string
+		empties uint8
+	}{
+		{"NoEmpties", 0},
+		{"One", 1},
+		{"Two", 2},
+		{"Three", 3},
+		{"Four", 4},
+		{"Five", 5},
+	}
+
+	for _, tcase := range cases {
+		t.Run(tcase.name, func(t *testing.T) {
+			assert := assert.New(t)
+			stateOverrides := make(map[uint8]uint8)
+			if tcase.empties > 0 {
+				for i := range tcase.empties {
+					stateOverrides[uint8(i+1)] = 0
+				}
+			}
+			board := NewBoardWithOverrideState(stateOverrides)
+			expected := tcase.empties + 1
+
+			firstNonEmptyPit := board.GetFirstNonEmptyPit(P1)
+
+			assert.Equal(expected, firstNonEmptyPit, tcase.name)
+		})
+	}
+}
+
+func TestGetFirstNonEmptyPit_P2(t *testing.T) {
+	var cases = []struct {
+		name    string
+		empties uint8
+	}{
+		{"NoEmpties", 0},
+		{"One", 1},
+		{"Two", 2},
+		{"Three", 3},
+		{"Four", 4},
+		{"Five", 5},
+	}
+
+	for _, tcase := range cases {
+		t.Run(tcase.name, func(t *testing.T) {
+			assert := assert.New(t)
+			stateOverrides := make(map[uint8]uint8)
+			if tcase.empties > 0 {
+				for i := range tcase.empties {
+					stateOverrides[uint8(13-i)] = 0
+				}
+			}
+			board := NewBoardWithOverrideState(stateOverrides)
+			expected := 13 - tcase.empties
+
+			firstNonEmptyPit := board.GetFirstNonEmptyPit(P2)
+
+			assert.Equal(expected, firstNonEmptyPit, tcase.name)
+		})
+	}
+
+}

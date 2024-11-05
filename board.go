@@ -168,6 +168,7 @@ func (b Board) IsPlayersStore(pit uint8, player Player) bool {
 	return uint8(player)*7 == pit
 }
 
+// GetFirstNonEmptyPit returns the first non-empty pit for a player from left to right
 func (b Board) GetFirstNonEmptyPit(player Player) uint8 {
 	startPit := uint8(1)
 	sign := 1
