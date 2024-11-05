@@ -41,8 +41,8 @@ func TestHandleSelectPit(t *testing.T) {
 	assert.Equal(uint8(4), state.inHand, "inHand")
 	assert.Equal(state.selectedPit, state.lastPlacedPit, "lastPlacedPit")
 	assert.Equal(MovingFromHandToPit, nextState, "state")
-
 }
+
 func TestMovingFromHandToPit_HandNotEmpty(t *testing.T) {
 	state := NewState()
 
@@ -50,7 +50,6 @@ func TestMovingFromHandToPit_HandNotEmpty(t *testing.T) {
 	nextState := state.HandleMoveFromHandToPit()
 
 	assert.Equal(t, MovingFromHandToPit, nextState, "next state")
-
 }
 
 func TestHandleMovingFromHandToPit_EmptyHandTurnOver(t *testing.T) {
@@ -63,6 +62,6 @@ func TestHandleMovingFromHandToPit_EmptyHandTurnOver(t *testing.T) {
 	state.state = state.HandleMoveFromHandToPit()
 	nextState := state.HandleMoveFromHandToPit()
 
-	assert.Equal(t, SwitchPlayer, nextState, "next state")
+	assert.Equal(t, DoneMoving, nextState, "next state")
 
 }
