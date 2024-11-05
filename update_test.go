@@ -77,6 +77,7 @@ func TestHandleDoneMoving_SwitchPlayer(t *testing.T) {
 	assert.Equal(t, SwitchPlayer, nextState, "next state")
 }
 
+// Game over - P1 side is empty
 func TestHandleDoneMoving_CollectRemainderP1(t *testing.T) {
 	state := NewModelWithState([14]uint8{
 		0, 0, 0, 0, 0, 0, 0,
@@ -87,6 +88,7 @@ func TestHandleDoneMoving_CollectRemainderP1(t *testing.T) {
 	assert.Equal(t, CollectRemainder, nextState, "next state")
 }
 
+// Game over - P2 side is empty
 func TestHandleDoneMoving_CollectRemainderP2(t *testing.T) {
 	state := NewModelWithState([14]uint8{
 		0, 1, 1, 1, 1, 1, 1,
@@ -110,5 +112,25 @@ func TestHandleDoneMoving_SelectingPitP1(t *testing.T) {
 	assert.Equal(t, uint8(1), state.selectedPit, "selectedPit")
 }
 
-func TestHandleDoneMoving_Stealing(t *testing.T) {
+func TestHandleDoneMoving_StealingP1FromP2(t *testing.T) {
+	state := NewModelWithState([14]uint8{
+		1, 1, 1, 1, 1, 1, 1,
+		1, 1, 1, 1, 1, 1, 1,
+	})
+	state.lastPlacedPit = 1
+	nextState := state.HandleDoneMoving()
+
+	assert.Equal(t, Stealing, nextState, "next state")
+}
+
+func TestHandleDoneMoving_StealingP2FromP1(t *testing.T) {
+	state := NewModelWithState([14]uint8{
+		1, 1, 1, 1, 1, 1, 1,
+		1, 1, 1, 1, 1, 1, 1,
+	})
+	state.lastPlacedPit = 9
+	state.currentPlayer = P2
+	nextState := state.HandleDoneMoving()
+
+	assert.Equal(t, Stealing, nextState, "next state")
 }
