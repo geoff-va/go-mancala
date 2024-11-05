@@ -63,5 +63,42 @@ func TestHandleMovingFromHandToPit_EmptyHandTurnOver(t *testing.T) {
 	nextState := state.HandleMoveFromHandToPit()
 
 	assert.Equal(t, DoneMoving, nextState, "next state")
+}
 
+// Turn is over
+func TestHandleDoneMoving_SwitchPlayer(t *testing.T) {
+	state := NewStateWithBoard([14]uint8{
+		0, 2, 1, 1, 1, 1, 1,
+		0, 1, 1, 1, 1, 1, 1,
+	})
+	state.lastPlacedPit = 1
+	nextState := state.HandleDoneMoving()
+
+	assert.Equal(t, SwitchPlayer, nextState, "next state")
+}
+
+func TestHandleDoneMoving_CollectRemainderP1(t *testing.T) {
+	state := NewStateWithBoard([14]uint8{
+		0, 0, 0, 0, 0, 0, 0,
+		0, 1, 1, 1, 1, 1, 1,
+	})
+	nextState := state.HandleDoneMoving()
+
+	assert.Equal(t, CollectRemainder, nextState, "next state")
+}
+
+func TestHandleDoneMoving_CollectRemainderP2(t *testing.T) {
+	state := NewStateWithBoard([14]uint8{
+		0, 1, 1, 1, 1, 1, 1,
+		0, 0, 0, 0, 0, 0, 0,
+	})
+	nextState := state.HandleDoneMoving()
+
+	assert.Equal(t, CollectRemainder, nextState, "next state")
+}
+
+func TestHandleDoneMoving_SelectingPit(t *testing.T) {
+}
+
+func TestHandleDoneMoving_Stealing(t *testing.T) {
 }
